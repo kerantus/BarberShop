@@ -1,7 +1,7 @@
 Вы уверены, что хотите выполнить следующую операцию(и):
 Создать таблицу "main"."Users"
 SQL:
-CREATE  TABLE "main"."Users" ("Id" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL  UNIQUE , "Name" VARCHAR NOT NULL , "Phone" VARCHAR NOT NULL , "DateStamp" VARCHAR NOT NULL , "Barber" VARCHAR NOT NULL , "Color" VARCHAR NOT NULL )
+CREATE  TABLE IF NOT EXISTS "main"."Users" ("Id" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL  UNIQUE , "Name" VARCHAR NOT NULL , "Phone" VARCHAR NOT NULL , "DateStamp" VARCHAR NOT NULL , "Barber" VARCHAR NOT NULL , "Color" VARCHAR NOT NULL )
 
 
 Вы уверены, что хотите выполнить следующую операцию(и):

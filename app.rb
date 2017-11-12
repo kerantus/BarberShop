@@ -2,6 +2,35 @@
 require 'rubygems'
 require 'sinatra'
 require 'sinatra/reloader'
+require 'sqlite3'
+
+configure do
+
+  @db = SQLite3::Database.new 'barbershop.db'
+
+  @db.execute 'CREATE TABLE IF NOT EXISTS
+  "Users"
+  (
+  "Id"
+  INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,
+  "Name" TEXT,
+  "Phone" TEXT,
+  "DateStamp" TEXT,
+  "Barber" TEXT,
+  "Color" TEXT
+  );'
+
+  @db.execute 'CREATE TABLE IF NOT EXISTS
+  "Contacts"
+  (
+  "Id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,
+  "Email" TEXT,
+  "Message" TEXT
+  );'
+
+  @db.close
+end
+
 
 get '/' do
   erb "Hello! <a href=\"https://github.com/bootstrap-ruby/sinatra-bootstrap\">Original</a> pattern has been modified for <a href=\"http://rubyschool.us/\">Ruby School!!!!!!!!!!!!!!</a>"
@@ -60,37 +89,37 @@ post '/contacts' do
   if @error > ""
     erb :contacts
 
-    else
+  else
 
-  begin #обработка ошибок
-    Pony.mail(
-        {
-            :subject => "С сайта BARBERSHOP",
-            :body => message,
-            :to => sent_to,
-            :from => my_mail,
+    begin #обработка ошибок
+      Pony.mail(
+          {
+              :subject => "С сайта BARBERSHOP",
+              :body => message,
+              :to => sent_to,
+              :from => my_mail,
 
-            :via => :smtp,
-            :via_options => {
-                :address => 'smtp.mail.ru',
-                :port => '465',
-                :tls => true,
-                :user_name => my_mail,
-                :password => password,
-                :authentication => :plain
-            }
-        }
-    )
-    @message = "Успешно отправлено"
-  rescue Net::SMTPAuthenticationError => error
-    @message = " Ошибка аутентификации " + error.message.to_s
-  rescue Net::SMTPFatalError => error
-    @message = " Проверьте данные адресата " + error.message
-      # puts "Не удалось отправить письмо"
-  ensure
-    #puts "Попытка отправки письма закончена"
-  end #обработка ошибок
-  erb :message
+              :via => :smtp,
+              :via_options => {
+                  :address => 'smtp.mail.ru',
+                  :port => '465',
+                  :tls => true,
+                  :user_name => my_mail,
+                  :password => password,
+                  :authentication => :plain
+              }
+          }
+      )
+      @message = "Успешно отправлено"
+    rescue Net::SMTPAuthenticationError => error
+      @message = " Ошибка аутентификации " + error.message.to_s
+    rescue Net::SMTPFatalError => error
+      @message = " Проверьте данные адресата " + error.message
+        # puts "Не удалось отправить письмо"
+    ensure
+      #puts "Попытка отправки письма закончена"
+    end #обработка ошибок
+    erb :message
   end
 end
 
