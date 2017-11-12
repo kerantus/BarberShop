@@ -1,0 +1,13 @@
+<body>
+<form action="contacts" method="POST" role="form">
+
+  <div class="form-group">
+      <label>e-mail отправителя сообщения</label>
+      <p><input class="form-control" type="email" placeholder="1@1.ru" name="user_email" value="<%= @user_email %>"></p>
+    </br>
+    <p><textarea class="form-control" placeholder="Текст сообщения" name="user_message"><%= @user_message %></textarea></p>
+    </br>
+    <button type="submit" class="btn btn-primary">Submit</button>
+      </div>
+</form>
+</body>
