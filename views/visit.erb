@@ -25,9 +25,9 @@
 
   <div class="form-group">
     <select name="user_master" class="form-group" type="text">
-      <option>Мастер 1</option>
-      <option>Мастер 2</option>
-      <option>Мастер 3</option>
+      <option <%= @user_master == "Мастер 1" ? 'selected' : '' %> >Мастер 1</option>
+      <option <%= @user_master == "Мастер 2" ? 'selected' : '' %> >Мастер 2</option>
+      <option <%= @user_master == "Мастер 3" ? 'selected' : '' %> >Мастер 3</option>
     </select>
   </div>
   </br>
