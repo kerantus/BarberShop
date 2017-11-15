@@ -1,4 +1,10 @@
 <h1>Записаться на посещение</h1>
+<script type="text/javascript">
+  $(function () {
+    $('#color').simplecolorpicker();
+    $('#datetimepicker').datetimepicker();
+  });
+</script>
 <p>
   <%=@message %>
 </p>
@@ -16,7 +22,7 @@
   #время
   <div class="form-group">
     <label>Время посищения салона</label>
-    <input type="datetime" class="form-control" name="user_time" placeholder="Время посещения" value="<%= @user_time %>">
+    <input id="datetimepicker" type="text" class="form-control" name="user_time" placeholder="Время посещения" value="<%= @user_time %>">
   </div>
   </br>
   #выбрать мастера
@@ -25,9 +31,7 @@
 
   <div class="form-group">
     <select name="user_master" class="form-group" type="text">
-      <option <%= @user_master == "Мастер 1" ? 'selected' : '' %> >Мастер 1</option>
-      <option <%= @user_master == "Мастер 2" ? 'selected' : '' %> >Мастер 2</option>
-      <option <%= @user_master == "Мастер 3" ? 'selected' : '' %> >Мастер 3</option>
+    <%=@print_vibor%>
     </select>
   </div>
   </br>
@@ -60,8 +64,4 @@
 
 
 
-<script type="text/javascript">
-  $(function () {
-    $('#color').simplecolorpicker();
-  });
-</script>
+

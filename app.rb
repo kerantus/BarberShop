@@ -4,11 +4,20 @@ require 'sinatra'
 require 'sinatra/reloader'
 require 'sqlite3'
 
+if (Gem.win_platform?)
+  Encoding.default_external = Encoding.find(Encoding.locale_charmap)
+  Encoding.default_internal = __ENCODING__
+
+  [STDIN, STDOUT].each do |io|
+    io.set_encoding(Encoding.default_external, Encoding.default_internal)
+  end
+end
+
 configure do
 
-  @db = SQLite3::Database.new 'barbershop.db'
+  db = SQLite3::Database.new (Dir.pwd + '/bd/bs.db')
 
-  @db.execute 'CREATE TABLE IF NOT EXISTS
+  db.execute 'CREATE TABLE IF NOT EXISTS
   "Users"
   (
   "Id"
@@ -20,7 +29,7 @@ configure do
   "Color" TEXT
   );'
 
-  @db.execute 'CREATE TABLE IF NOT EXISTS
+  db.execute 'CREATE TABLE IF NOT EXISTS
   "Contacts"
   (
   "Id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,
@@ -28,7 +37,22 @@ configure do
   "Message" TEXT
   );'
 
-  @db.close
+  db.close
+  db = SQLite3::Database.new (Dir.pwd + '/bd/bs.db')
+
+  db.execute 'CREATE TABLE IF NOT EXISTS
+  "Master"
+  (
+  "Id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,
+  "Name" TEXT,
+  "Male" TEXT
+  );'
+
+  db.close
+end
+
+def get_db_bs
+  return SQLite3::Database.new (Dir.pwd + '/bd/bs.db')
 end
 
 
@@ -40,18 +64,27 @@ get '/about' do
   erb :about
 end
 
+
+
+# запись к парихмехеру
 get '/writeof' do
+  spisok_masters
   erb :visit
+
 end
 
 post '/writeof' do
+
+  spisok_masters
+  #erb :visit
+
   @user_name = params[:user_name]
   @user_phone = params[:user_phone]
   @user_time = params[:user_time]
   @user_master = params[:user_master]
   @user_color = params[:color]
   @title = 'Thank you'
-  @message = "#{@user_name}, вы записаны к #{@user_master} на #{@user_time}"
+
   hh = {
       :user_name => 'Введите имя',
       :user_phone => 'Введите телефон',
@@ -61,13 +94,34 @@ post '/writeof' do
   if @error != ""
     return erb :visit
   end
+  db = get_db_bs
+  db.execute 'INSERT INTO
+  "Users"
+  (
+  "Name",
+  "Phone",
+  "DateStamp",
+  "Barber",
+  "Color"
+  )
+  VALUES
+(
+?, ?, ?, ?, ?
+)', [@user_name, @user_phone, @user_time, @user_master, @user_color]
+
+  @message = "#{@user_name}, вы записаны к #{@user_master} на #{@user_time}"
+
   f = File.open "./public/users.txt", "a"
   f.write "\n #{@user_master} \n #{@user_time} -- #{@user_phone} -- #{@user_name} -- #{@user_color} \n"
   f.close
   erb :message
 end
+#=============================================================================================
 
 
+
+
+# написать письмо
 get '/contacts' do
   erb :contacts
 end
@@ -123,6 +177,9 @@ post '/contacts' do
   end
 end
 
+#==============================================================================
+
+
 
 get '/login' do
   erb :login
@@ -132,11 +189,12 @@ post '/login/attempt' do
   @username = params[:username]
   @pass = params[:pass]
   if @username == "admin" && @pass == "secret"
-    session[:identity] = params['username']
-    where_user_came_from = session[:previous_url] || '/'
-    redirect to where_user_came_from
+
+    db = get_db_bs
+    @result = db.execute 'select * from Users order by DateStamp'
+    erb :db_writer
   else
-    where_user_came_from = session[:previous_url] || '/login/attempt'
+    where_user_came_from = session[:previous_url] || '/login'
     redirect to where_user_came_from
     @message = "Доступ запрещён"
   end
@@ -146,3 +204,22 @@ get '/logout' do
   session.delete(:identity)
   erb "<div class='alert alert-message'>Logged out</div>"
 end
+
+def spisok_masters
+  db = get_db_bs
+  @print_vibor = ''
+  db.execute 'select Name from Master' do |row|
+    row.each do |value|
+      @print_vibor = @print_vibor + '<option value='+ "#{value.to_s}"
+      if value.to_s == @user_master
+        @print_vibor = @print_vibor + ' selected'
+      end
+    @print_vibor = @print_vibor+ '>'+"#{value.to_s}"+'</option>'+"\n"
+    end
+  end
+  db.close
+  return @print_vibor
+end
+
+
+

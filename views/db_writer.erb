@@ -1,0 +1,50 @@
+<html xmlns="http://www.w3.org/1999/html">
+<h1>Таблица записавшихся</h1>
+<body>
+<%= @data_db %>
+</br>
+</br>
+</br>
+</br>
+
+<table class="table">
+  <thead>
+    <th>№</th>
+    <th>Имя</th>
+    <th>Телефон</th>
+    <th>Дата</th>
+    <th>Мастер</th>
+    <th>Цвет</th>
+  </thead>
+<body>
+  <% @result.each do |row| %>
+    <tr>
+      <td><%= row[0] %></td>
+      <td><%= row[1] %></td>
+      <td><%= row[2] %></td>
+      <td><%= row[3] %></td>
+      <td><%= row[4] %></td>
+      <td><%= row[5] %></td>
+    </tr>
+
+
+  <% end %>
+</body>
+</table>
+
+
+
+
+
+
+
+
+
+</body>
+
+
+
+
+
+
+</html>
