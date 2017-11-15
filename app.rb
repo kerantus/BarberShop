@@ -13,9 +13,36 @@ if (Gem.win_platform?)
   end
 end
 
+def is_barber_exists? db, name
+ db.execute('select * from Master where name=?', [name]).length > 0
+end
+
+def seed_db db, master
+
+  master.each do |masters|
+    if !is_barber_exists? db, masters
+      db.execute 'insert into Master (Name) values (?)', [masters]
+    end
+  end
+
+end
+
+def get_db_bs
+  db = SQLite3::Database.new (Dir.pwd + '/bd/bs.db')
+  db.results_as_hash = true
+  return db
+end
+
+before do
+  db = get_db_bs
+  @master = db.execute 'select * from Master'
+end
+
+
+
 configure do
 
-  db = SQLite3::Database.new (Dir.pwd + '/bd/bs.db')
+  db = get_db_bs
 
   db.execute 'CREATE TABLE IF NOT EXISTS
   "Users"
@@ -37,23 +64,20 @@ configure do
   "Message" TEXT
   );'
 
-  db.close
-  db = SQLite3::Database.new (Dir.pwd + '/bd/bs.db')
-
   db.execute 'CREATE TABLE IF NOT EXISTS
   "Master"
   (
   "Id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,
-  "Name" TEXT,
-  "Male" TEXT
+  "Name" TEXT
   );'
+
+  seed_db db, ['keGZ', 'Ronaldo', 'Suka','Suka', 'Suka', 'Tvarit Dobro']
+
+
 
   db.close
 end
 
-def get_db_bs
-  return SQLite3::Database.new (Dir.pwd + '/bd/bs.db')
-end
 
 
 get '/' do
@@ -63,7 +87,6 @@ get '/about' do
   @error
   erb :about
 end
-
 
 
 # запись к парихмехеру
@@ -117,8 +140,6 @@ post '/writeof' do
   erb :message
 end
 #=============================================================================================
-
-
 
 
 # написать письмо
@@ -180,7 +201,6 @@ end
 #==============================================================================
 
 
-
 get '/login' do
   erb :login
 end
@@ -189,7 +209,6 @@ post '/login/attempt' do
   @username = params[:username]
   @pass = params[:pass]
   if @username == "admin" && @pass == "secret"
-
     db = get_db_bs
     @result = db.execute 'select * from Users order by DateStamp'
     erb :db_writer
@@ -205,21 +224,9 @@ get '/logout' do
   erb "<div class='alert alert-message'>Logged out</div>"
 end
 
-def spisok_masters
-  db = get_db_bs
-  @print_vibor = ''
-  db.execute 'select Name from Master' do |row|
-    row.each do |value|
-      @print_vibor = @print_vibor + '<option value='+ "#{value.to_s}"
-      if value.to_s == @user_master
-        @print_vibor = @print_vibor + ' selected'
-      end
-    @print_vibor = @print_vibor+ '>'+"#{value.to_s}"+'</option>'+"\n"
-    end
-  end
-  db.close
-  return @print_vibor
-end
+
+
+
 
 
 

@@ -31,7 +31,9 @@
 
   <div class="form-group">
     <select name="user_master" class="form-group" type="text">
-    <%=@print_vibor%>
+    <% @master.each do |item| %>
+      <option <%= @user_master == item['Name'] ? 'selected' : '' %>><%= item['Name']%></option>
+      <% end %>
     </select>
   </div>
   </br>
